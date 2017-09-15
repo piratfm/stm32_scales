@@ -17,13 +17,13 @@ Used hardware:
  * STM32F103C8T6 as MCU and software-base LCD controller (by using RTC interrupts)
 
 To calibrate:
-1). Put weight meter into the flat table (without any load).
-2). Press "tare" button when powering-on device (press both buttons, tare and power).
-3). You will see some 5-digit number, this is initial ADC value without scale.
-4). When You see "10.000" on display, put 10.000 Kg reference load onto weight meter.
-5). You will see some 5-digit number again, but a little bit higher, this is ADC value with load and without scale.
-6). Then You will see 4-digit number in range 35...300. This is calculated "scale" value for calibration, that number will be saved into flash.
-7). Done, Your weight meter is now calibrated and displays correct value in Kg.
+ 1). Put weight meter into the flat table (without any load).
+ 2). Press "tare" button when powering-on device (press both buttons, tare and power).
+ 3). You will see some 5-digit number, this is initial ADC value without scale.
+ 4). When You see "10.000" on display, put 10.000 Kg reference load onto weight meter.
+ 5). You will see some 5-digit number again, but a little bit higher, this is ADC value with load and without scale.
+ 6). Then You will see 4-digit number in range 35...300. This is calculated "scale" value for calibration, that number will be saved into flash.
+ 7). Done, Your weight meter is now calibrated and displays correct value in Kg.
 
 
 Power consumption:
