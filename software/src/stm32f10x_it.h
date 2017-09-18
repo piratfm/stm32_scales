@@ -41,6 +41,8 @@ void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 void EXTI0_IRQHandler(void);
+void EXTI1_IRQHandler(void);
+void PVD_IRQHandler(void);
 void TIM3_IRQHandler(void);
 void RTCAlarm_IRQHandler(void);
 

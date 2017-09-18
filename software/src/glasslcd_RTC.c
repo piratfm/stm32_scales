@@ -21,7 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "glasslcd_RTC.h"
-
+extern __IO uint32_t VoltageFlag;
 
 /** @addtogroup GlassLCD
   * @{
@@ -125,7 +125,7 @@ const uint16_t numMap[11][4] = {
 
 void LCD_WriteInt(int val)
 {
-	SegmentsValues_Lower_Quarter_Digits[0] = 0x000 | 0x400;//kg
+	SegmentsValues_Lower_Quarter_Digits[0] = 0x000 | 0x400 | VoltageFlag;//kg
 	SegmentsValues_Lower_Quarter_Digits[1] = 0x000;
 	SegmentsValues_Lower_Quarter_Digits[2] = 0x000;
 	SegmentsValues_Lower_Quarter_Digits[3] = 0x000 | 0x008;//dot
@@ -144,10 +144,7 @@ void LCD_WriteInt(int val)
 
 		if(i==0 && cval > 9) {
 			// "error string"
-			SegmentsValues_Lower_Quarter_Digits[0] |= 0x003 | 0x000 | 0x000 | 0x000 | 0x000;
-			SegmentsValues_Lower_Quarter_Digits[1] |= 0x001 | 0x004 | 0x010 | 0x040 | 0x100;
-			SegmentsValues_Lower_Quarter_Digits[2] |= 0x001 | 0x004 | 0x010 | 0x0C0 | 0x100;
-			SegmentsValues_Lower_Quarter_Digits[3] |= 0x001 | 0x000 | 0x000 | 0x040 | 0x000;
+			LCD_WriteError();
 			return;
 		}
 
@@ -165,19 +162,43 @@ void LCD_WriteInt(int val)
 
 void LCD_WriteCfg()
 {
-	SegmentsValues_Lower_Quarter_Digits[0] = 0x003 | 0x00C | 0x030;
+	SegmentsValues_Lower_Quarter_Digits[0] = 0x003 | 0x00C | 0x030 | VoltageFlag;
 	SegmentsValues_Lower_Quarter_Digits[1] = 0x000 | 0x004 | 0x000;
 	SegmentsValues_Lower_Quarter_Digits[2] = 0x001 | 0x004 | 0x030;
 	SegmentsValues_Lower_Quarter_Digits[3] = 0x001 | 0x000 | 0x010;
 }
+
+void LCD_WriteError()
+{
+	SegmentsValues_Lower_Quarter_Digits[0] |= 0x003 | 0x000 | 0x000 | 0x000 | 0x000;
+	SegmentsValues_Lower_Quarter_Digits[1] |= 0x001 | 0x004 | 0x010 | 0x040 | 0x100;
+	SegmentsValues_Lower_Quarter_Digits[2] |= 0x001 | 0x004 | 0x010 | 0x0C0 | 0x100;
+	SegmentsValues_Lower_Quarter_Digits[3] |= 0x001 | 0x000 | 0x000 | 0x040 | 0x000;
+}
+
 void LCD_WriteLines()
 {
-	SegmentsValues_Lower_Quarter_Digits[0] = 0;
+	SegmentsValues_Lower_Quarter_Digits[0] = 0 | VoltageFlag;
 	SegmentsValues_Lower_Quarter_Digits[1] = 0x155; // -----
 	SegmentsValues_Lower_Quarter_Digits[2] = 0;
 	SegmentsValues_Lower_Quarter_Digits[3] = 0;
 }
 
+void LCD_WriteNone()
+{
+	SegmentsValues_Lower_Quarter_Digits[0] = 0 | 0x400 | VoltageFlag;//kg;
+	SegmentsValues_Lower_Quarter_Digits[1] = 0; // -----
+	SegmentsValues_Lower_Quarter_Digits[2] = 0;
+	SegmentsValues_Lower_Quarter_Digits[3] = 0;
+}
+
+void LCD_WriteAll()
+{
+	SegmentsValues_Lower_Quarter_Digits[0] = 0xFFF;//kg;
+	SegmentsValues_Lower_Quarter_Digits[1] = 0xFFF;
+	SegmentsValues_Lower_Quarter_Digits[2] = 0xFFF;
+	SegmentsValues_Lower_Quarter_Digits[3] = 0xFFF;
+}
 
 /**
   * @}

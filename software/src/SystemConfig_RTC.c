@@ -58,6 +58,9 @@ void SystemConfiguration(void)
   /* Configure the GPIOs */
   GPIO_Configuration();
 
+  /* Configure voltage detector */
+  PVD_Configuration();
+
   /* Configure the GPIOs for HX711 */
   HX711_Init();
 
@@ -324,7 +327,8 @@ void EXTI_Configuration(void)
 
 
 
-void USART2_Init( void ) {
+void USART2_Init( void )
+{
     USART_ClockInitTypeDef USART_ClockInitStruct;
     USART_InitTypeDef USART_InitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -358,6 +362,40 @@ void USART2_Init( void ) {
     NVIC_Init(&NVIC_InitStructure);*/
 }
 
+
+void PVD_Configuration(void)
+{
+  NVIC_InitTypeDef NVIC_InitStructure;
+  EXTI_InitTypeDef EXTI_InitStructure;
+
+  /* Enable PWR clock */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+
+  /* Configure one bit for preemption priority */
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+
+  /* Enable the PVD Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = PVD_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+
+  /* Configure EXTI Line16(PVD Output) to generate an interrupt on rising and
+     falling edges */
+  EXTI_ClearITPendingBit(EXTI_Line16);
+  EXTI_InitStructure.EXTI_Line = EXTI_Line16;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Configure the PVD Level to 2.7V */
+  PWR_PVDLevelConfig(PWR_PVDLevel_2V7);
+
+  /* Enable the PVD Output */
+  PWR_PVDCmd(ENABLE);
+}
 
 /**
   * @}

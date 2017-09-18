@@ -44,8 +44,9 @@ extern const uint16_t CommonLine[4];
 extern uint32_t CommonLine_OUT_PP[4];
 extern uint32_t CommonLine_VDD_2[4];
 uint32_t lcdcr=0;
-__IO uint32_t LCDPowerOn=0;
+__IO uint32_t LCDPowerOn=1;
 __IO uint32_t TarePressed=0;
+__IO uint32_t VoltageFlag=0x000;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -157,22 +158,6 @@ void EXTI1_IRQHandler(void)
  {
 	 TarePressed=1;
 	 EXTI_ClearITPendingBit(EXTI_Line1);
-
-	if(!LCDPowerOn) {
-#if 0
-		/* Request to enter STOP mode with regulator low power */
-		//PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);
-		RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-		SCB->SCR |= SCB_SCR_SLEEPDEEP;
-		PWR->CR |= PWR_CR_PDDS;
-		PWR->CR |= PWR_CR_CWUF;
-		PWR->CSR |= PWR_CSR_EWUP;
-		__WFE();
-#else
-		//PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);
-#endif
-	}
-
  }
 }
 
@@ -213,14 +198,8 @@ void EXTI0_IRQHandler(void)
      /* LCD Bias Plus Pin = 0V  */
      GPIO_ResetBits(LCD_Bias_Port, LCD_BiasPlus_Pin);
 
-
-     /* Clear EXTI pending bit */ 
-     EXTI_ClearITPendingBit(EXTI_Line0);
-
      LCDPowerOn = 0;
-   }
-   else
-   {
+   } else if(LCDPowerOn == 0) {
      /* Enable the RTC Alarm */
      RTC_ITConfig(RTC_IT_ALR, ENABLE); 
 
@@ -241,13 +220,28 @@ void EXTI0_IRQHandler(void)
      /* Power on the resistor bridge  */
      GPIO_SetBits(LCD_Bias_Port, LCD_BiasPlus_Pin);
 
-     /* Clear EXTI pending bit */ 
-     EXTI_ClearITPendingBit(EXTI_Line0);
-
      LCDPowerOn = 1;
    }
+
+    /* Clear EXTI pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line0);
   }
 }
+
+
+void PVD_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line16) != RESET)
+  {
+	//VoltageFlag=0x000;
+	VoltageFlag = (PWR_GetFlagStatus(PWR_FLAG_PVDO)==SET) ? 0x800 : 0x000;
+
+    /* Clear the Key Button EXTI line pending bit */
+    EXTI_ClearITPendingBit(EXTI_Line16);
+  }
+}
+
+
 /**
   * @brief  This function handles TIM3_IRQHandler .
   * @param  None

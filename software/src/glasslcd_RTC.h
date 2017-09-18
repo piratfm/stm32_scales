@@ -75,7 +75,7 @@
 
 /* LCD Contrast value settings */
 /* LCDContrastValue and PeriodValue are the only parameters modifiable by the user */
-#define LCDContrastValue          50  /* LCD Contrast value in percent from 0 to 100 */
+#define LCDContrastValue          70  /* LCD Contrast value in percent from 0 to 100 */
 #define PeriodValue               28  /* Period */
 
 /* Parameters not modifiable by the user */
@@ -104,6 +104,10 @@
 void LCD_GPIO_Init(void);
 void LCD_WriteInt(int val);
 void LCD_WriteLines();
+void LCD_WriteNone();
+void LCD_WriteAll();
+void LCD_WriteCfg();
+void LCD_WriteError();
 
 #endif /* __GLASSLCD_RTC_H */
 

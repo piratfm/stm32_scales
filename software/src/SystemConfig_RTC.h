@@ -38,6 +38,7 @@ void GPIO_Configuration(void);
 void NVIC_Configuration(void); 
 void EXTI_Configuration(void);
 void RTC_Configuration(void);
+void PVD_Configuration(void);
 void RTC_Init(void);
 void USART2_Init(void);
 	  
