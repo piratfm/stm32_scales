@@ -44,7 +44,7 @@ extern const uint16_t CommonLine[4];
 extern uint32_t CommonLine_OUT_PP[4];
 extern uint32_t CommonLine_VDD_2[4];
 uint32_t lcdcr=0;
-__IO uint32_t LCDPowerOn=1;
+__IO uint32_t LCDPowerOn=0;
 __IO uint32_t TarePressed=0;
 __IO uint32_t VoltageFlag=0x000;
 /* Private function prototypes -----------------------------------------------*/
@@ -199,6 +199,23 @@ void EXTI0_IRQHandler(void)
      GPIO_ResetBits(LCD_Bias_Port, LCD_BiasPlus_Pin);
 
      LCDPowerOn = 0;
+
+#if 1
+	while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == Bit_RESET) {};
+	Delay(50000);
+
+	 GPIO_InitTypeDef GPIO_InitStructure;
+	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_All;
+	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+	 GPIO_Init(GPIOA, &GPIO_InitStructure);
+	 GPIO_Init(GPIOB, &GPIO_InitStructure);
+	 GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	 TarePressed=0;
+	 PWR_WakeUpPinCmd(ENABLE);
+	 PWR_EnterSTANDBYMode();
+#endif
+
    } else if(LCDPowerOn == 0) {
      /* Enable the RTC Alarm */
      RTC_ITConfig(RTC_IT_ALR, ENABLE); 

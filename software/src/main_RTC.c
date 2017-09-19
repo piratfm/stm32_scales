@@ -95,7 +95,7 @@ int main(void)
 
 
 
-  LCDPowerOn=1;
+  LCDPowerOn=0;
 
   sc_t scale;
   scale.f = DEFAULT_SCALE;
@@ -107,6 +107,7 @@ do_calc_scale:
   if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == Bit_RESET) {
 	 LCDPowerOn=2;
 	 LCD_WriteCfg();
+	 cnt_raw = HX711_Average_Value(1, 8);
 	 printf("do configuration!\r\n");
 	 while(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == Bit_RESET) {}
 
@@ -117,7 +118,7 @@ do_calc_scale:
      printf("Calculating scale...\r\n");
      Delay(500000);
      printf("Getting zero weight....\r\n");
-     cnt_raw = HX711_Average_Value(3, 32);
+     cnt_raw = HX711_Average_Value(1, 32);
      printf("cnt[0.000]: %d => %d\r\n", cnt_raw);
      LCD_WriteInt(cnt_raw/100);
      printf("Now put 10.000Kg and measure weight again...\r\n");
@@ -128,7 +129,7 @@ do_calc_scale:
     	 LCD_WriteInt(10000);
     	 Delay(60000);
      }
-     tare = HX711_Average_Value(3, 32);
+     tare = HX711_Average_Value(1, 32);
      printf("cnt[10.000]: %d\r\n", tare);
      LCD_WriteInt(tare/100);
      Delay(1000000);
@@ -159,7 +160,6 @@ do_calc_scale:
          FLASH_Lock();
          printf("Done, scale saved!\r\n");
      }
-     LCDPowerOn=1;
   } else {
 	  uint32_t *scale_sign_u32 =  (uint32_t*)0x800FC04;
 	  uint32_t *scale_u32 =  (uint32_t*)0x800FC08;
@@ -186,6 +186,7 @@ do_calc_scale:
 
 measures_begin:
   /* Power on the resistor bridge */
+LCDPowerOn=1;
 
   is_intial = 1;
   is_tare_setted = 0;
@@ -239,7 +240,7 @@ re_sleep:
 	}
 #endif
 
-	cnt_raw = HX711_Average_Value(3, 8);
+	cnt_raw = HX711_Average_Value(1, 8);
 	printf("cnt: %d => %d, LCD: %d\r\n", cnt_raw, cnt_raw - tare, (cnt_raw - tare)/scale);
 
 	if(is_intial) {
