@@ -16,6 +16,7 @@ it by STM32 is made. As additional "pro", scales precision has been 10x increase
 ## Used hardware:
  * HX711 ADC
  * STM32F103C8T6 as MCU and software-base LCD controller (by using RTC interrupts)
+ 
  schematic of the board: [schematic](https://github.com/piratfm/stm32_scales/blob/master/hardware/weightmeter_schematic.pdf)
 
 ## To calibrate:
