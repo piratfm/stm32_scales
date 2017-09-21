@@ -1,9 +1,12 @@
 # STM32 scales
 
-Software and hardware for weight meter (scales) with glass LCD display
+Software and hardware for child weight meter (scales) with glass LCD display
 Based on branded Chicco weight meter model # 8312.60.001
-Due original "brains" PCB became broken, the decision to replace
-it by STM32 is made.
+
+![scales image](https://github.com/piratfm/stm32_scales/blob/master/hardware/chicco_comfort_1.jpg)
+
+Due original "brains" PCB became broken for some reason (operational amplifier burned-out, and scales always shows zeroes), the decision to replace
+it by STM32 is made. As additional "pro", scales precision has been 10x increased, comparing to original "brains" of scales.
 
 ## Original parts that been used:
  * load sensors bridge (3 pins each).
