@@ -102,7 +102,7 @@
 /* Exported functions ------------------------------------------------------- */
 /* APPLICATION LAYER ---------------------------------------------------------*/
 void LCD_GPIO_Init(void);
-void LCD_WriteInt(int val);
+void LCD_WriteInt(int val, int flag);
 void LCD_WriteLines();
 void LCD_WriteNone();
 void LCD_WriteAll();

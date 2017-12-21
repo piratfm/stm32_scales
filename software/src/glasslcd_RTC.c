@@ -123,8 +123,10 @@ const uint16_t numMap[11][4] = {
 	{0x000, 0x001, 0x000, 0x000} //-
 };
 
-void LCD_WriteInt(int val)
+void LCD_WriteInt(int val, int flag)
 {
+
+
 	SegmentsValues_Lower_Quarter_Digits[0] = 0x000 | 0x400 | VoltageFlag;//kg
 	SegmentsValues_Lower_Quarter_Digits[1] = 0x000;
 	SegmentsValues_Lower_Quarter_Digits[2] = 0x000;
@@ -133,6 +135,10 @@ void LCD_WriteInt(int val)
 		SegmentsValues_Lower_Quarter_Digits[3] |= 0x002;
 		val = -val;
 	}
+
+	if(flag)
+		SegmentsValues_Lower_Quarter_Digits[3] |= 0x800;
+
 
 	int divider = 10000;
 

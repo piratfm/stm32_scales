@@ -390,8 +390,8 @@ void PVD_Configuration(void)
   EXTI_InitStructure.EXTI_LineCmd = ENABLE;
   EXTI_Init(&EXTI_InitStructure);
 
-  /* Configure the PVD Level to 2.7V */
-  PWR_PVDLevelConfig(PWR_PVDLevel_2V7);
+  /* Configure the PVD Level to 2.8V */
+  PWR_PVDLevelConfig(PWR_PVDLevel_2V8);
 
   /* Enable the PVD Output */
   PWR_PVDCmd(ENABLE);

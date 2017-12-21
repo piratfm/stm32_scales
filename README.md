@@ -24,9 +24,17 @@ it by STM32 is made. As additional "pro", scales precision has been 10x increase
  2. Press "tare" button when powering-on device (press both buttons, tare and power).
  3. You will see some 5-digit number, this is initial ADC value without scale.
  4. When You see "10.000" on display, put 10.000 Kg reference load onto weight meter.
- 5 . You will see some 5-digit number again, but a little bit higher, this is ADC value with load and without scale.
+ 5. You will see some 5-digit number again, but a little bit higher, this is ADC value with load and without scale.
  6. Then You will see 4-digit number in range 35...300. This is calculated "scale" value for calibration, that number will be saved into flash.
  7. Done, Your weight meter is now calibrated and displays correct value in Kg.
+
+## To measure:
+ 1. Turn on scales.
+ 2. Wait until it shows 00000.
+ 3. Put load into the scales and wait until triangle appears on display.
+ 4. There will be actual measured weight (in average mode), so even if kid is moving, the scales are still show precise value.
+ 5. After some time, the weight amount will blink and keeps displayed even if load is removed (memory function).
+ 6. After some time more, scales turns off automatically.
 
 
 ## Power consumption:

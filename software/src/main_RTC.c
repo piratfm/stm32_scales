@@ -23,6 +23,7 @@
 #include "stm32f10x.h"
 #include "SystemConfig_RTC.h"
 #include "hx711.h"
+#include <math.h>
 
 
 /** @addtogroup GlassLCD
@@ -93,6 +94,10 @@ int main(void)
   int is_intial = 1;
   int is_tare_setted = 0;
 
+  double val_buffer[32];
+  int val_filled = 0;
+  double val;
+
 
 
   LCDPowerOn=0;
@@ -120,25 +125,25 @@ do_calc_scale:
      printf("Getting zero weight....\r\n");
      cnt_raw = HX711_Average_Value(1, 32);
      printf("cnt[0.000]: %d => %d\r\n", cnt_raw);
-     LCD_WriteInt(cnt_raw/100);
+     LCD_WriteInt(cnt_raw/100, 0);
      printf("Now put 10.000Kg and measure weight again...\r\n");
      Delay(500000);
      for (i=0;i<10;i++) {
     	 LCD_WriteNone();
     	 Delay(60000);
-    	 LCD_WriteInt(10000);
+    	 LCD_WriteInt(10000, 0);
     	 Delay(60000);
      }
      tare = HX711_Average_Value(1, 32);
      printf("cnt[10.000]: %d\r\n", tare);
-     LCD_WriteInt(tare/100);
+     LCD_WriteInt(tare/100, 0);
      Delay(1000000);
      double scale2 = ((double)((double)tare - (double)cnt_raw)) / 10000.0;
      scale.f = scale2;
      if(scale.f < 0)
     	 scale.f = -scale.f;
      printf("scale[1/10.000]: %d\r\n", (int)scale.f);
-     LCD_WriteInt(scale.f);
+     LCD_WriteInt(scale.f, 0);
      Delay(500000);
 
      if(scale.f < 35.0 || scale.f > 250.0) {
@@ -190,6 +195,8 @@ LCDPowerOn=1;
 
   is_intial = 1;
   is_tare_setted = 0;
+  val_filled = 0;
+  val = 0.0;
 
   printf("Hello main! Scale is: %d\r\n", scale);
   TarePressed=0;
@@ -217,12 +224,16 @@ re_sleep:
 //		  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
 //		  GPIO_Init(GPIOA, &GPIO_InitStructure);
 #endif
+		Delay(5000);
+
 	    TarePressed=0;
 		//PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI);
 
 		//GPIO_Configuration();
 	    PWR_WakeUpPinCmd(ENABLE);
+		Delay(5000);
 		PWR_EnterSTANDBYMode();
+		Delay(5000);
 		//tune scale
 		if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == Bit_RESET && GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == Bit_RESET)
 			goto do_calc_scale;
@@ -230,6 +241,7 @@ re_sleep:
 		if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) != Bit_RESET)
 			goto re_sleep;
 
+		Delay(5000);
 		continue;
         //RCC->APB1ENR |= RCC_APB1ENR_PWREN;
         //SCB->SCR |= SCB_SCR_SLEEPDEEP;
@@ -247,8 +259,38 @@ re_sleep:
 		is_intial=0;
 		continue;
 	} else if (is_tare_setted) {
-		double val = ((double)cnt_raw - (double)tare)/scale.f;
-		LCD_WriteInt(val);
+		int val_int = cnt_raw - tare;
+		double val_new = ((double)val_int)/((double)scale.f);
+		val_buffer[val_filled & 0x1f] = val_new;
+		val_filled++;
+		if(val_filled < 48) {
+			//reset counters if too large difference (+/-250 grams)
+			double val_diff = val_new - val;
+			if(val_diff > 250.0 || val_diff < -250.0 || val_new < 500.0)
+				val_filled=0;
+			if(val_filled < 32) {
+				val = val_new;
+			} else {
+				int arr_cnt;
+				val=0.0;
+				for(arr_cnt=0;arr_cnt<32;arr_cnt++) {
+					val += val_buffer[arr_cnt];
+				}
+				val = val/32.0;
+			}
+			LCD_WriteInt(val, (val_filled >= 32));
+		} else {
+			for (i=0;i<10;i++) {
+				LCD_WriteNone();
+				Delay(100000);
+				LCD_WriteInt(val, 1);
+				Delay(100000);
+			}
+			val_filled=0;
+			//don't measure, just display.
+			Delay(10000000);
+			goto re_sleep;
+		}
 	} else {
 		tare=cnt_raw;
 		printf("new tare: %d\r\n", tare);
@@ -267,8 +309,10 @@ re_sleep:
 		prev_value=cnt_raw/1000;
 		prev_value_count=0;
 	} else {
+
 		prev_value_count++;
-		if(prev_value_count >= 200)
+
+		if(prev_value_count >= 256)
 			goto re_sleep;
 	}
 
